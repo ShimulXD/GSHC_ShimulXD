@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSHC Shimul</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* পিডিএফ কন্টেইনার */
+        #pdf-container {
+            width: 100%;
+            overflow: hidden;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .pdf-page {
+            margin: 10px 0;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* পিডিএফ নেভিগেশন বাটন */
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .nav-btn {
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+            width: 50px;
+            height: 50px;
+        }
+
+        .nav-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+
+        .nav-btn:active {
+            background-color: #388e3c;
+            transform: scale(0.9);
+        }
+
+        /* মোবাইল এবং ট্যাবলেটের জন্য রেসপন্সিভ ডিজাইন */
+        @media (max-width: 768px) {
+            #pdf-container {
+                padding: 10px;
+            }
+
+            .pdf-page {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            #controls {
+                left: 50%;
+                gap: 15px;
+                transform: translateX(-50%);
+                top: 15px; /* মোবাইলে অবস্থান একটু নিচে */
+            }
+
+            .nav-btn {
+                font-size: 18px;
+                padding: 12px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* ডাউনলোড বাটনের ডিজাইন */
+        #download-btn {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 100;
+            background-color: #2196F3;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            animation: fadeIn 2s ease-out;
+        }
+
+        #download-btn:hover {
+            background-color: #0b7dda;
+            transform: scale(1.1);
+        }
+
+        #download-btn:active {
+            background-color: #09588a;
+            transform: scale(0.9);
+        }
+
+        /* লোডিং এনিমেশন */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ফুটার ডিজাইন */
+        #footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #333;
+            z-index: 100;
+            animation: fadeInUp 2s ease-in-out;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* নেভিগেশন বাটনগুলোর জন্য এনিমেশন */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Shimul XD</h1>
+    <marquee behavior="scroll" direction="left" scrollamount="10">
+  ☞সরকারি শামসুল হক কলেজ || একাদশ শ্রেণির অর্ধবার্ষিক পরীক্ষার সাজেশন☜
+</marquee>
+    <div id="pdf-container"></div>
+
+    <!-- ডাউনলোড বাটন -->
+    <button id="download-btn">⬇️</button>
+
+    <!-- পিডিএফ নেভিগেশন বাটন -->
+    <div id="controls">
+        <button class="nav-btn" id="prev-page">⟨</button>
+        <button class="nav-btn" id="next-page">⟩</button>
+    </div>
+
+    <!-- লোডিং এনিমেশন -->
+    <div id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- ফুটার -->
+    <div id="footer">S H I M U L X D</div>
+
+    <script>
+        const url = 'https://raw.githubusercontent.com/ShimulXD/GSHC_ShimulXD/main/gshc_shimulxd.pdf';
+        let pdfDoc = null;
+        let currentPage = 1;
+        let scale = 1.2;
+        let totalPages = 0;
+
+        // PDF.js লোড করা
+        pdfjsLib.getDocument(url).promise.then(function(pdf) {
+            pdfDoc = pdf;
+            totalPages = pdf.numPages;
+            renderPage(currentPage);
+        });
+
+        // পৃষ্ঠা রেন্ডার করার ফাংশন
+        function renderPage(pageNum) {
+            document.getElementById('loading').style.display = 'flex'; // লোডিং অ্যানিমেশন দেখানো
+            pdfDoc.getPage(pageNum).then(function(page) {
+                const viewport = page.getViewport({ scale: scale });
+                const canvas = document.createElement('canvas');
+                canvas.classList.add('pdf-page');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                });
+
+                const pdfContainer = document.getElementById('pdf-container');
+                pdfContainer.innerHTML = ''; // পূর্বের পৃষ্ঠা সরানো
+                pdfContainer.appendChild(canvas);
+
+                document.getElementById('loading').style.display = 'none'; // লোডিং অ্যানিমেশন লুকানো
+            });
+        }
+
+        // পরবর্তী পেজ
+        document.getElementById('next-page').addEventListener('click', function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        });
+
+        // পূর্ববর্তী পেজ
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        });
+
+        // ডাউনলোড বাটনের কার্যকলাপ
+        document.getElementById('download-btn').addEventListener('click', function() {
+            window.location.href = 'https://github.com/ShimulXD/GSHC_ShimulXD/releases/download/GSHC_Shimulxd/gshc_shimulxd.pdf';
+        });
+    </script>
+</body>
+</html>
